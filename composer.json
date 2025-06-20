@@ -1,0 +1,11 @@
+{
+    "name": "vhf-web/propstack-sync",
+    "description": "Synchronizes apartments and parking spaces from Propstack API",
+    "type": "wordpress-plugin",
+    "autoload": {
+      "psr-4": {
+        "PropstackSync\\": "includes/"
+      }
+    },
+    "require": {}
+  }

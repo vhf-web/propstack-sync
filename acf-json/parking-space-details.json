@@ -1,0 +1,72 @@
+{
+  "key": "group_parking",
+  "title": "Parking Space Details",
+  "fields": [
+    {
+      "key": "field_unit_id",
+      "label": "Unit ID",
+      "name": "unit_id",
+      "type": "text"
+    },
+    {
+      "key": "field_address",
+      "label": "Address",
+      "name": "address",
+      "type": "text"
+    },
+    {
+      "key": "field_price",
+      "label": "Price",
+      "name": "price",
+      "type": "number"
+    },
+    {
+      "key": "field_lat",
+      "label": "Latitude",
+      "name": "lat",
+      "type": "number"
+    },
+    {
+      "key": "field_lng",
+      "label": "Longitude",
+      "name": "lng",
+      "type": "number"
+    },
+    {
+      "key": "field_status_name",
+      "label": "Status Name",
+      "name": "status_name",
+      "type": "text"
+    },
+    {
+      "key": "field_free_from",
+      "label": "Free From",
+      "name": "free_from",
+      "type": "text"
+    },
+    {
+      "key": "field_image_url",
+      "label": "Image URL",
+      "name": "image_url",
+      "type": "url"
+    }
+  ],
+  "location": [
+    [
+      {
+        "param": "post_type",
+        "operator": "==",
+        "value": "parking_space"
+      }
+    ]
+  ],
+  "menu_order": 0,
+  "position": "normal",
+  "style": "default",
+  "label_placement": "top",
+  "instruction_placement": "label",
+  "hide_on_screen": "",
+  "active": true,
+  "description": "",
+  "modified": 1749292612
+}
