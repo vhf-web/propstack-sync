@@ -19,6 +19,23 @@ add_filter('acf/settings/load_json', function ($paths) {
     return $paths;
 });
 
+// In plugin oder Theme functions.php (besser im Plugin)
+function register_projekt_post_type() {
+    register_post_type('projekt', [
+        'labels' => [
+            'name' => 'Projekte',
+            'singular_name' => 'Projekt',
+        ],
+        'public' => true,
+        'has_archive' => false,
+        'menu_position' => 20,
+        'menu_icon' => 'dashicons-building',
+        'supports' => ['title', 'editor', 'thumbnail'],
+        'show_in_rest' => true,
+    ]);
+}
+add_action('init', 'register_projekt_post_type');
+
 // Boot plugin
 add_action('plugins_loaded', function () {
     // CPTs

@@ -2,11 +2,13 @@
 
 namespace Propstack\Includes\Admin;
 
+use Propstack\Includes\SyncService;
+
 class SettingsPage
 {
-    const OPTION_API_URL   = 'propstack_api_url';
-    const OPTION_PROJECT_ID = 'propstack_project_id';
-    const OPTION_API_TOKEN  = 'propstack_api_token';
+    const OPTION_API_URL     = 'propstack_api_url';
+    const OPTION_PROJECT_ID  = 'propstack_project_id';
+    const OPTION_API_TOKEN   = 'propstack_api_token';
 
     public function __construct()
     {
@@ -47,18 +49,18 @@ class SettingsPage
                             <input type="url"
                                    name="<?php echo esc_attr(self::OPTION_API_URL); ?>"
                                    id="propstack_api_url"
-                                   value="<?php echo esc_attr(get_option(self::OPTION_API_URL)); ?>"
+                                   value="<?php echo esc_attr(self::get_api_url()); ?>"
                                    class="regular-text"
                                    placeholder="https://api.propstack.de/v2/properties">
                         </td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row"><label for="propstack_project_id">Project ID</label></th>
+                        <th scope="row"><label for="propstack_project_id">Projekt ID</label></th>
                         <td>
                             <input type="text"
                                    name="<?php echo esc_attr(self::OPTION_PROJECT_ID); ?>"
                                    id="propstack_project_id"
-                                   value="<?php echo esc_attr(get_option(self::OPTION_PROJECT_ID)); ?>"
+                                   value="<?php echo esc_attr(self::get_project_id()); ?>"
                                    class="regular-text"
                                    placeholder="z. B. 404126">
                         </td>
@@ -69,19 +71,22 @@ class SettingsPage
                             <input type="text"
                                    name="<?php echo esc_attr(self::OPTION_API_TOKEN); ?>"
                                    id="propstack_api_token"
-                                   value="<?php echo esc_attr(get_option(self::OPTION_API_TOKEN)); ?>"
+                                   value="<?php echo esc_attr(self::get_api_token()); ?>"
                                    class="regular-text"
                                    placeholder="Bearer-Token, wenn benötigt">
+                            <p class="description">Du kannst den Token auch sicher in der <code>wp-config.php</code> setzen mit <code>define('PROPSTACK_API_TOKEN', '...');</code>.</p>
                         </td>
                     </tr>
                 </table>
                 <?php submit_button('Speichern'); ?>
             </form>
 
+            <hr>
+
             <form method="post" action="">
-    <input type="hidden" name="propstack_manual_sync" value="1">
-    <?php submit_button('Jetzt synchronisieren', 'primary', 'submit', false); ?>
-</form>
+                <input type="hidden" name="propstack_manual_sync" value="1">
+                <?php submit_button('Jetzt synchronisieren', 'primary', 'submit', false); ?>
+            </form>
         </div>
         <?php
     }
@@ -98,31 +103,45 @@ class SettingsPage
 
     public static function get_api_token(): ?string
     {
+        if (defined('PROPSTACK_API_TOKEN')) {
+            return PROPSTACK_API_TOKEN;
+        }
+
         return get_option(self::OPTION_API_TOKEN);
     }
 
     public function maybe_run_sync()
-{
-    if (!current_user_can('manage_options')) {
-        return;
+    {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        if (!empty($_POST['propstack_manual_sync'])) {
+            $projekt_id = self::get_project_id();
+            $projekt_post_id = 0; // kein echter Post, reiner API-Test
+
+            if ($projekt_id) {
+                $service = new SyncService();
+                $result = $service->sync_project($projekt_id, $projekt_post_id);
+
+                $message = sprintf(
+                    '✔ %d neue Apartments erstellt, %d aktualisiert.',
+                    $result['created'],
+                    $result['updated']
+                );
+
+                add_action('admin_notices', function () use ($message) {
+                    echo '<div class="notice notice-success is-dismissible"><p>' .
+                        esc_html($message) .
+                        '</p></div>';
+                });
+            } else {
+                add_action('admin_notices', function () {
+                    echo '<div class="notice notice-error is-dismissible"><p>' .
+                        esc_html__('❌ Kein Projekt ID angegeben.', 'propstack') .
+                        '</p></div>';
+                });
+            }
+        }
     }
-
-    if (!empty($_POST['propstack_manual_sync'])) {
-        $service = new \Propstack\Includes\SyncService();
-        $result = $service->run();
-
-        $message = sprintf(
-            '✔ %d neue Apartments erstellt, %d aktualisiert.',
-            $result['created'],
-            $result['updated']
-        );
-
-        add_action('admin_notices', function () use ($message) {
-            echo '<div class="notice notice-success is-dismissible"><p>' .
-                esc_html($message) .
-                '</p></div>';
-        });
-    }
-}
-
 }

@@ -4,24 +4,76 @@ namespace Propstack\Includes\PostHandler;
 
 class ApartmentHandler
 {
-    public static function create_or_update(array $data): string
-    {
-        $unitId = $data['unit_id'] ?? null;
+public static function create_or_update(array $item, int $projekt_post_id): string
+{
+    $title = $item['name'] ?? $item['unit_id'] ?? 'Unbenannt';
+    $existing = get_page_by_title($title, OBJECT, 'we');
+    $post_id = $existing ? $existing->ID : null;
 
-        if (!$unitId) {
-            return 'skipped';
-        }
+    $post_data = [
+        'post_title'   => $title,
+        'post_type'    => 'we',
+        'post_status'  => 'publish',
+        'post_content' => $item['long_description_note'] ?? '',
+    ];
 
-        $existing = self::find_by_unit_id($unitId);
+    if ($post_id) {
+        $post_data['ID'] = $post_id;
+        wp_update_post($post_data);
+        $action = 'updated';
+    } else {
+        $post_id = wp_insert_post($post_data);
+        $action = 'created';
+    }
 
-        if ($existing) {
-            self::update($existing, $data);
-            return 'updated';
-        } else {
-            self::create($data);
-            return 'created';
+    // ACF-Felder speichern
+    if (function_exists('update_field')) {
+        update_field('wohnflaeche', $item['living_space'], $post_id);
+        update_field('preis', $item['price'], $post_id);
+        update_field('zimmeranzahl', $item['number_of_rooms'], $post_id);
+        update_field('zugehoeriges_projekt', $projekt_post_id, $post_id);
+    }
+
+    // Dokumente als Media-Dateien anhängen
+    if (!empty($item['documents'])) {
+        foreach ($item['documents'] as $doc) {
+            $url = $doc['doc']['url'] ?? null;
+            $title = $doc['title'] ?? null;
+            if ($url && $title) {
+                self::attach_document($url, $title, $post_id);
+            }
         }
     }
+
+    return $action;
+}
+
+protected static function attach_document($url, $title, $post_id)
+{
+    require_once(ABSPATH . 'wp-admin/includes/file.php');
+    require_once(ABSPATH . 'wp-admin/includes/media.php');
+    require_once(ABSPATH . 'wp-admin/includes/image.php');
+
+    // Lade PDF temporär herunter
+    $tmp = download_url($url);
+    if (is_wp_error($tmp)) {
+        return;
+    }
+
+    $file_array = [
+        'name'     => sanitize_file_name($title),
+        'tmp_name' => $tmp,
+    ];
+
+    // Füge Datei als Attachment hinzu
+    $attachment_id = media_handle_sideload($file_array, $post_id);
+
+    if (!is_wp_error($attachment_id)) {
+        // Optional: Setze als ACF-Galerie oder einfach verlinken
+        // update_field('dokumente', [...], $post_id);
+        add_post_meta($post_id, '_propstack_document_ids', $attachment_id);
+    }
+}
 
     private static function find_by_unit_id(string $unitId): ?int
     {
