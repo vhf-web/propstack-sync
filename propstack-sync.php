@@ -7,20 +7,35 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-    exit; // Exit if accessed directly
+    exit;
 }
 
+// Autoload classes via Composer
+require_once __DIR__ . '/vendor/autoload.php';
 
-// Include files
-require_once plugin_dir_path( __FILE__ ) . 'includes/cpt-types.php';
-require_once plugin_dir_path( __FILE__ ) . 'includes/api-client.php';
-require_once plugin_dir_path(__FILE__) . 'includes/admin-sync-button.php';
-require_once plugin_dir_path(__FILE__) . 'includes/sync.php';
-
-
+// Register ACF JSON loading
 add_filter('acf/settings/load_json', function ($paths) {
     $paths[] = plugin_dir_path(__FILE__) . 'acf-json';
     return $paths;
 });
 
+// Boot plugin
+add_action('plugins_loaded', function () {
+    // CPTs
+    if (class_exists(\Propstack\Includes\CPT\ApartmentCPT::class)) {
+        new \Propstack\Includes\CPT\ApartmentCPT();
+    }
 
+    if (class_exists(\Propstack\Includes\CPT\ParkingCPT::class)) {
+        new \Propstack\Includes\CPT\ParkingCPT();
+    }
+
+    // Admin interface
+    if (class_exists(\Propstack\Includes\Admin\SettingsPage::class)) {
+        new \Propstack\Includes\Admin\SettingsPage();
+    }
+
+    if (class_exists(\Propstack\Includes\Admin\SyncButton::class)) {
+        new \Propstack\Includes\Admin\SyncButton();
+    }
+});

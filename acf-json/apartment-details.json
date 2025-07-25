@@ -1,78 +1,112 @@
-{
-  "key": "group_apartment",
-  "title": "Apartment Details",
-  "fields": [
-    {
-      "key": "field_unit_id",
-      "label": "Unit ID",
-      "name": "unit_id",
-      "type": "text"
-    },
-    {
-      "key": "field_address",
-      "label": "Address",
-      "name": "address",
-      "type": "text"
-    },
-    {
-      "key": "field_price",
-      "label": "Price",
-      "name": "price",
-      "type": "number"
-    },
-    {
-      "key": "field_living_space",
-      "label": "Living Space",
-      "name": "living_space",
-      "type": "number"
-    },
-    {
-      "key": "field_lat",
-      "label": "Latitude",
-      "name": "lat",
-      "type": "number"
-    },
-    {
-      "key": "field_lng",
-      "label": "Longitude",
-      "name": "lng",
-      "type": "number"
-    },
-    {
-      "key": "field_status_name",
-      "label": "Status Name",
-      "name": "status_name",
-      "type": "text"
-    },
-    {
-      "key": "field_free_from",
-      "label": "Free From",
-      "name": "free_from",
-      "type": "text"
-    },
-    {
-      "key": "field_image_url",
-      "label": "Image URL",
-      "name": "image_url",
-      "type": "url"
-    }
-  ],
-  "location": [
-    [
+[
+  {
+    "key": "group_apartment_details_extended",
+    "title": "Apartment Details (Extended)",
+    "fields": [
       {
-        "param": "post_type",
-        "operator": "==",
-        "value": "apartment"
+        "key": "field_image_gallery",
+        "label": "Image Gallery",
+        "name": "image_gallery",
+        "type": "gallery"
+      },
+      {
+        "key": "field_number_of_rooms",
+        "label": "Number of Rooms",
+        "name": "number_of_rooms",
+        "type": "number"
+      },
+      {
+        "key": "field_number_of_bed_rooms",
+        "label": "Number of Bedrooms",
+        "name": "number_of_bed_rooms",
+        "type": "number"
+      },
+      {
+        "key": "field_number_of_bath_rooms",
+        "label": "Number of Bathrooms",
+        "name": "number_of_bath_rooms",
+        "type": "number"
+      },
+      {
+        "key": "field_floor",
+        "label": "Floor",
+        "name": "floor",
+        "type": "text"
+      },
+      {
+        "key": "field_total_rent",
+        "label": "Total Rent",
+        "name": "total_rent",
+        "type": "number"
+      },
+      {
+        "key": "field_service_charge",
+        "label": "Service Charge",
+        "name": "service_charge",
+        "type": "number"
+      },
+      {
+        "key": "field_construction_year",
+        "label": "Construction Year",
+        "name": "construction_year",
+        "type": "number"
+      },
+      {
+        "key": "field_energy_efficiency_class",
+        "label": "Energy Efficiency Class",
+        "name": "energy_efficiency_class",
+        "type": "select",
+        "choices": {
+          "A+": "A+",
+          "A": "A",
+          "B": "B",
+          "C": "C",
+          "D": "D",
+          "E": "E",
+          "F": "F",
+          "G": "G",
+          "H": "H"
+        }
+      },
+      {
+        "key": "field_description_note",
+        "label": "Short Description",
+        "name": "description_note",
+        "type": "textarea"
+      },
+      {
+        "key": "field_long_description_note",
+        "label": "Long Description",
+        "name": "long_description_note",
+        "type": "wysiwyg"
+      },
+      {
+        "key": "field_rented",
+        "label": "Rented",
+        "name": "rented",
+        "type": "true_false"
+      },
+      {
+        "key": "field_free_from",
+        "label": "Free From",
+        "name": "free_from",
+        "type": "text"
       }
-    ]
-  ],
-  "menu_order": 0,
-  "position": "normal",
-  "style": "default",
-  "label_placement": "top",
-  "instruction_placement": "label",
-  "hide_on_screen": "",
-  "active": true,
-  "description": "",
-  "modified": 1749292612
-}
+    ],
+    "location": [
+      [
+        {
+          "param": "post_type",
+          "operator": "==",
+          "value": "apartment"
+        }
+      ]
+    ],
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "active": true,
+    "description": ""
+  }
+]
