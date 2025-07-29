@@ -10,23 +10,6 @@ class SettingsPage
     const OPTION_PROJECT_ID  = 'propstack_project_id';
     const OPTION_API_TOKEN   = 'propstack_api_token';
 
-    public function __construct()
-    {
-        add_action('admin_menu', [$this, 'add_menu_page']);
-        add_action('admin_init', [$this, 'register_settings']);
-        add_action('admin_init', [$this, 'maybe_run_sync']);
-    }
-
-    public function add_menu_page()
-    {
-        add_options_page(
-            'Propstack Sync',
-            'Propstack Sync',
-            'manage_options',
-            'propstack-sync',
-            [$this, 'render_settings_page']
-        );
-    }
 
     public function register_settings()
     {
@@ -34,6 +17,12 @@ class SettingsPage
         register_setting('propstack_sync_options', self::OPTION_PROJECT_ID);
         register_setting('propstack_sync_options', self::OPTION_API_TOKEN);
     }
+
+    public static function render_settings_page_static()
+{
+    $instance = new self();
+    $instance->render_settings_page();
+}
 
     public function render_settings_page()
     {
@@ -144,4 +133,5 @@ class SettingsPage
             }
         }
     }
+
 }
