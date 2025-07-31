@@ -6,58 +6,63 @@
  * Author: Berlintina
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if (!defined('ABSPATH')) {
     exit;
 }
 
 // Autoload classes via Composer
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/includes/ApartmentPermalinks.php';
+
+use Propstack\Includes\CPT\ApartmentCPT;
+use Propstack\Includes\CPT\ParkingCPT;
+use Propstack\Includes\CPT\ProjectCPT;
 use Propstack\Includes\Cron\CronHandler;
+use Propstack\Includes\Admin\SyncButton;
+use Propstack\Includes\Admin\DashboardPage;
 
+// Plugin-URL-Konstante
+define('PROPSTACK_PLUGIN_URL', plugin_dir_url(__FILE__));
 
-// Register ACF JSON loading
+// 🔧 ACF JSON laden
 add_filter('acf/settings/load_json', function ($paths) {
     $paths[] = plugin_dir_path(__FILE__) . 'acf-json';
     return $paths;
 });
 
-
-// Boot plugin
-add_action('plugins_loaded', function () {
-    // CPTs
-     if (class_exists(\Propstack\Includes\CPT\ProjectCPT::class)) {
-        new \Propstack\Includes\CPT\ProjectCPT();
-    }
-    if (class_exists(\Propstack\Includes\CPT\ApartmentCPT::class)) {
-        new \Propstack\Includes\CPT\ApartmentCPT();
-    }
-
-    if (class_exists(\Propstack\Includes\CPT\ParkingCPT::class)) {
-        new \Propstack\Includes\CPT\ParkingCPT();
-    }
-    if (class_exists(\Propstack\Includes\Cron\CronHandler::class)) {
-        new  Propstack\Includes\Cron\CronHandler;
-     }
-    // Admin interface
-    if (class_exists(\Propstack\Includes\Admin\SettingsPage::class)) {
-        new \Propstack\Includes\Admin\SettingsPage();
+// ✅ CPTs direkt initialisieren (nicht per init-Hook)
+new ApartmentCPT();
+new ProjectCPT();
+// Wenn Parking später gebraucht wird, aktivieren:
+// new ParkingCPT();
+error_log(print_r(get_post_type_object('project'), true));
+// 🧰 Weitere Komponenten nach Plugin-Load
+add_action('init', function () {
+    if (class_exists(CronHandler::class)) {
+        new CronHandler();
     }
 
-    if (class_exists(\Propstack\Includes\Admin\SyncButton::class)) {
-        new \Propstack\Includes\Admin\SyncButton();
+    if (class_exists(SyncButton::class)) {
+        new SyncButton();
     }
-    if (class_exists(\Propstack\Includes\Admin\DashboardPage::class)) {
-        new \Propstack\Includes\Admin\DashboardPage();
+
+    if (class_exists(DashboardPage::class)) {
+        new DashboardPage();
     }
-        \Propstack\Includes\ApartmentPermalinks::init();
-     
+
+    \Propstack\Includes\ApartmentPermalinks::init();
 });
 
+// 🛠️ Cron-Hooks
 register_activation_hook(__FILE__, [CronHandler::class, 'activate']);
 register_deactivation_hook(__FILE__, [CronHandler::class, 'deactivate']);
-define('PROPSTACK_PLUGIN_URL', plugin_dir_url(__FILE__));
 
+// 🧪 Debug: registrierte Post Types anzeigen
+add_action('wp_loaded', function () {
+    error_log(print_r(get_post_types(), true));
+});
+
+// 🔍 Admin-Filter: Wohnungen nach Projekt filtern
 add_action('restrict_manage_posts', function () {
     global $typenow;
 
@@ -84,6 +89,7 @@ add_action('restrict_manage_posts', function () {
     echo '</select>';
 });
 
+// 🎯 Filter-Logik anwenden
 add_action('pre_get_posts', function ($query) {
     if (!is_admin() || !$query->is_main_query()) {
         return;
@@ -98,4 +104,3 @@ add_action('pre_get_posts', function ($query) {
         ]);
     }
 });
-

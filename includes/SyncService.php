@@ -3,6 +3,7 @@
 namespace Propstack\Includes;
 
 use Propstack\Includes\PostHandler\ApartmentHandler;
+use Propstack\Includes\PostHandler\ProjectHandler;
 // use Propstack\Includes\PostHandler\ParkingHandler;
 // use Propstack\Includes\PostHandler\GewerbeHandler;
 

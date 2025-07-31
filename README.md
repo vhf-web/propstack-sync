@@ -48,7 +48,7 @@ Klicke auf „Jetzt synchronisieren“
 → Die Daten werden geladen, verarbeitet und gespeichert.
 
 🧠 Wie es funktioniert
-SettingsPage.php: Admin-Seite mit Einstellungen und Sync-Button
+Dashboard.php: Admin-Seite mit Einstellungen und Sync-Button
 
 SyncService.php: Steuert den gesamten Synchronisationsprozess
 
@@ -72,7 +72,7 @@ Bearbeiten
 propstack-sync/
 ├── includes/
 │   ├── Admin/
-│   │   ├── SettingsPage.php
+│   │   ├── Dashboard.php
 │   ├── CPT/
 │   │   ├── ApartmentCPT.php
 │   ├── PostHandler/

@@ -1,14 +1,10 @@
 jQuery(document).ready(function ($) {
-    $('.propstack-sync-btn').on('click', function (e) {
-        e.preventDefault();
-
+    $('.propstack-sync-btn').on('click', function () {
         const button = $(this);
-        const row = button.closest('tr');
-        const status = row.find('.sync-status');
         const projectId = button.data('project');
         const postId = button.data('post-id');
-
-        status.text('🔄 Synchronisation läuft...');
+        const status = button.siblings('.sync-status-apartment');
+        status.text('⏳ Lädt...');
 
         $.post(PropstackSync.ajaxUrl, {
             action: 'propstack_sync_project_ajax',
@@ -17,16 +13,30 @@ jQuery(document).ready(function ($) {
             post_id: postId
         }, function (response) {
             if (response.success) {
-                const created = response.data.created;
-                const updated = response.data.updated;
-                const total = response.data.total || created + updated;
-                const message = `✅ ${created} neu, ${updated} aktualisiert (${created + updated}/${total})`;
-                status.text(message);
+                status.text('✅ ' + response.data.message);
             } else {
-                status.text('❌ Fehler: ' + response.data);
+                status.text('❌ Fehler');
             }
-        }).fail(function () {
-            status.text('❌ Serverfehler');
+        });
+    });
+
+    $('.propstack-sync-meta-btn').on('click', function () {
+        const button = $(this);
+        const projectId = button.data('project');
+        const status = button.siblings('.sync-status-project');
+        status.text('⏳ Lädt...');
+
+        $.post(PropstackSync.ajaxUrl, {
+            action: 'propstack_sync_project_meta',
+            nonce: PropstackSync.nonce,
+            project_id: projectId
+        }, function (response) {
+              console.log('Projekt-Meta-Sync Response:', response); // <--- NEU
+            if (response.success) {
+                status.text('✅ ' + response.data.message);
+            } else {
+                status.text('❌ Fehler beim Projekt-Sync');
+            }
         });
     });
 });

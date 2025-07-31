@@ -1,0 +1,14 @@
+{
+    "key": "group_project_details",
+    "title": "Projekt Details",
+    "fields": [
+      { "key": "field_propstack_id", "label": "Propstack ID", "name": "propstack_id", "type": "text" },
+      { "key": "field_street", "label": "Straße", "name": "street", "type": "text" },
+      { "key": "field_house_number", "label": "Hausnummer", "name": "house_number", "type": "text" },
+      { "key": "field_zip_code", "label": "PLZ", "name": "zip_code", "type": "text" },
+      { "key": "field_city", "label": "Stadt", "name": "city", "type": "text" },
+      { "key": "field_address", "label": "Adresse", "name": "address", "type": "text" },
+      { "key": "field_country", "label": "Land", "name": "country", "type": "text" }
+    ],
+    "location": [[{ "param": "post_type", "operator": "==", "value": "project" }]]
+  }
