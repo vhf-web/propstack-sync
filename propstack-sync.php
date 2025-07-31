@@ -12,7 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Autoload classes via Composer
 require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/includes/ApartmentPermalinks.php';
 use Propstack\Includes\Cron\CronHandler;
+
 
 // Register ACF JSON loading
 add_filter('acf/settings/load_json', function ($paths) {
@@ -48,6 +50,7 @@ add_action('plugins_loaded', function () {
     if (class_exists(\Propstack\Includes\Admin\DashboardPage::class)) {
         new \Propstack\Includes\Admin\DashboardPage();
     }
+        \Propstack\Includes\ApartmentPermalinks::init();
      
 });
 
@@ -95,3 +98,4 @@ add_action('pre_get_posts', function ($query) {
         ]);
     }
 });
+
