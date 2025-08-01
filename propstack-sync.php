@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
 
 // Autoload classes via Composer
 require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/includes/ApartmentPermalinks.php';
+require_once __DIR__ . '/includes/ContentTypePermalinks.php';
 
 use Propstack\Includes\CPT\ApartmentCPT;
 use Propstack\Includes\CPT\ParkingCPT;
@@ -50,7 +50,7 @@ add_action('init', function () {
         new DashboardPage();
     }
 
-    \Propstack\Includes\ApartmentPermalinks::init();
+    \Propstack\Includes\ContentTypePermalinks::init();
 });
 
 // 🛠️ Cron-Hooks
