@@ -77,7 +77,7 @@ class ApartmentHandler
             update_field('house_number', $item['house_number'] ?? '', $post_id);
             update_field('zip_code', $item['zip_code'] ?? '', $post_id);
             update_field('city', $item['city'] ?? '', $post_id);
-            update_field('property_space_value', $status_name, $post_id);
+            update_field('property_space_value', $item['property_space_value'] ?? '', $post_id);
             update_field('object_type', $item['object_type'] ?? '', $post_id);
             update_field('rs_type', $item['rs_type'] ?? '', $post_id);
             update_field('living_space', $item['living_space'] ?? '', $post_id);
@@ -95,7 +95,7 @@ class ApartmentHandler
             update_field('furnishing_note', $item['furnishing_note'] ?? '', $post_id);
             update_field('location_note', $item['location_note'] ?? '', $post_id);
             update_field('other_note', $item['other_note'] ?? '', $post_id);
-            update_field('status_name', $item['status_name'] ?? '', $post_id);
+            update_field('status_name', $status_name, $post_id);
             update_field('price', $item['price'] ?? '', $post_id);
             update_field('base_rent', $item['base_rent'] ?? '', $post_id);
             update_field('floor', $item['floor'] ?? '', $post_id);
