@@ -3,11 +3,29 @@ namespace Propstack\Includes\PostHandler;
 
 class ApartmentHandler
 {
+     /**
+     * Holt den Statusnamen basierend auf der Statuszahl.
+     */
+    private static function get_status_name_by_id( $status_id ) {
+        $status_names = array(
+            142965 => 'Akquise',
+            142966 => 'Vorbereitung',
+            142967 => 'Vermarktung',
+            142968 => 'Reserviert',
+            142969 => 'Verkauft',
+            147772 => 'Inaktiv',
+            147773 => 'Archiviert',
+            155686 => 'Beauftragt',
+        );
+
+        // Rückgabe des Statusnamens oder "Unbekannt", falls der Status nicht existiert
+        return isset($status_names[$status_id]) ? $status_names[$status_id] : 'Unbekannt';
+    }
+
     public static function create_or_update(array $item, int $project_post_id): string
     {
         // 1. Titel wählen
         $title = $item['name'] ?? $item['unit_id'] ?? 'Untitled';
-
         // 2. Bestehenden Beitrag finden
         $query = new \WP_Query([
             'post_type'      => 'apartment',
@@ -47,6 +65,8 @@ class ApartmentHandler
             $post_id = wp_insert_post($post_data);
             $action = 'created';
         }
+        
+        $status_name = self::get_status_name_by_id($item['property_status_id'] ?? 0); // Holen des Statusnamens anhand der Zahl
 
         // 4. ACF-Felder speichern
         if (function_exists('update_field')) {
@@ -57,7 +77,7 @@ class ApartmentHandler
             update_field('house_number', $item['house_number'] ?? '', $post_id);
             update_field('zip_code', $item['zip_code'] ?? '', $post_id);
             update_field('city', $item['city'] ?? '', $post_id);
-            update_field('property_space_value', $item['property_space_value'] ?? '', $post_id);
+            update_field('property_space_value', $status_name, $post_id);
             update_field('object_type', $item['object_type'] ?? '', $post_id);
             update_field('rs_type', $item['rs_type'] ?? '', $post_id);
             update_field('living_space', $item['living_space'] ?? '', $post_id);
