@@ -113,11 +113,19 @@ class ApartmentHandler
             update_field('features', $item['features'] ?? '', $post_id);
             update_field('free_from', $item['free_from'] ?? '', $post_id);
 
-            // Nur erstes Bild speichern
-            $image_url = $item['images'][0]['url'] ?? null;
-            if ($image_url) {
-                update_field('image_url', $image_url, $post_id);
-            }
+$gallery_urls = [];
+
+foreach ($item['images'] ?? [] as $image) {
+    if (!empty($image['url'])) {
+        $gallery_urls[] = [
+            'url'   => esc_url_raw($image['url']),
+            'title' => sanitize_text_field($image['title'] ?? ''),
+        ];
+    }
+}
+
+update_field('gallery_urls', $gallery_urls, $post_id);
+
         }
 
         // 5. Dokumente als JSON (wenn nötig)
