@@ -112,6 +112,7 @@ class ApartmentHandler
             update_field('heating_type', $item['heating_type'] ?? '', $post_id);
             update_field('features', $item['features'] ?? '', $post_id);
             update_field('free_from', $item['free_from'] ?? '', $post_id);
+            update_field('price_formatted', number_format($item['price'] ?? 0, 0, ',', '.'), $post_id);
 
 $gallery_urls = [];
 
