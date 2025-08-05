@@ -18,6 +18,10 @@ class ParkingCPT
                 'singular_name' => 'Parking Space',
                 'add_new_item' => 'Add New Parking Space',
             ],
+            'rewrite' => [
+            'slug' => 'stellplatz',
+            'with_front' => false,
+            ],
             'public' => true,
             'menu_icon' => 'dashicons-car',
             'supports' => ['title', 'editor', 'thumbnail', 'custom-fields'],

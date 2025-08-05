@@ -28,6 +28,10 @@ class ApartmentCPT
                 'menu_name'          => 'Wohnungseinheiten',
                 'name_admin_bar'     => 'Wohnungseinheit',
             ],
+            'rewrite' => [
+            'slug' => 'wohnung',
+            'with_front' => false,
+            ],
             'public'       => true,
             'menu_icon'    => 'dashicons-building',
             'supports'     => ['title', 'editor', 'thumbnail', 'custom-fields'],

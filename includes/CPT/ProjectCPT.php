@@ -35,9 +35,9 @@ class ProjectCPT
             'supports'      => ['title', 'editor', 'thumbnail', 'custom-fields'],
             'has_archive'   => true,
             'show_in_rest'  => true,
-            'rewrite'       => ['slug' => 'project'],
+            'rewrite'       => ['slug' => 'projekt'],
         ]);
 
-        error_log('[PropstackSync] ✅ CPT "Projekt" (slug: project) registered');
+        error_log('[PropstackSync] ✅ CPT "Projekt" (slug: projekt) registered');
     }
 }
