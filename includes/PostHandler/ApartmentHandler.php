@@ -10,7 +10,7 @@ class ApartmentHandler
         $status_names = array(
             142965 => 'Akquise',
             142966 => 'Vorbereitung',
-            142967 => 'Vermarktung',
+            142967 => 'Verfügbar',
             142968 => 'Reserviert',
             142969 => 'Verkauft',
             147772 => 'Inaktiv',
@@ -105,6 +105,16 @@ class ApartmentHandler
             update_field('related_project', $project_post_id, $post_id);
             update_field('object_number', $item['object_number'] ?? '', $post_id);
             update_field('status', $item['status'] ?? '', $post_id);
+            $post_url = get_permalink($post_id);
+
+            if ($status_name === 'Verfügbar') {
+                $status_display = '<a href="' . esc_url($post_url) . '" title="Zur Detailseite '.$item['unit_id'].'">' . esc_html($status_name) . '</a>';
+            } else {
+                $status_display = esc_html($status_name);
+            }
+
+            update_field('status_display', $status_display, $post_id);
+
             update_field('marketing_type', $item['marketing_type'] ?? '', $post_id);
             update_field('viewing_note', $item['viewing_note'] ?? '', $post_id);
             update_field('balcony', $item['balcony'] ?? '', $post_id);
