@@ -31,8 +31,9 @@ class ApartmentHandler
             'post_type'      => 'apartment',
             'post_status'    => 'any',
             'meta_query'     => [
+                'relation' => 'AND',
                 [
-                    'key'     => 'propstack_id', // ← eindeutig!
+                    'key'     => 'propstack_id', 
                     'value'   => $item['id'] ?? '',
                     'compare' => '='
                 ],
@@ -106,50 +107,75 @@ class ApartmentHandler
             update_field('object_number', $item['object_number'] ?? '', $post_id);
             update_field('status', $item['status'] ?? '', $post_id);
             $post_url = get_permalink($post_id);
-
-            if ($status_name === 'Verfügbar') {
-                $status_display = '<a href="' . esc_url($post_url) . '" title="Zur Detailseite '.$item['unit_id'].'">' . esc_html($status_name) . '</a>';
-            } else {
-                $status_display = esc_html($status_name);
-            }
-
-            update_field('status_display', $status_display, $post_id);
-
-            update_field('marketing_type', $item['marketing_type'] ?? '', $post_id);
-            update_field('viewing_note', $item['viewing_note'] ?? '', $post_id);
-            update_field('balcony', $item['balcony'] ?? '', $post_id);
-            update_field('elevator', $item['elevator'] ?? '', $post_id);
-            update_field('heating_type', $item['heating_type'] ?? '', $post_id);
-            update_field('features', $item['features'] ?? '', $post_id);
-            update_field('free_from', $item['free_from'] ?? '', $post_id);
-            update_field('price_formatted', number_format($item['price'] ?? 0, 0, ',', '.'), $post_id);
-
-$gallery_urls = [];
-
-foreach ($item['images'] ?? [] as $image) {
-    if (!empty($image['url'])) {
-        $gallery_urls[] = [
-            'url'   => esc_url_raw($image['url']),
-            'title' => sanitize_text_field($image['title'] ?? ''),
-        ];
+    if ($status_name === 'Verfügbar') {
+        $status_display = '<a href="' . esc_url($post_url) . '" title="Zur Detailseite ' . esc_attr($item['unit_id'] ?? '') . '">' . esc_html($status_name) . '</a>';
+    } else {
+        $status_display = esc_html($status_name);
     }
+    update_field('status_display', $status_display, $post_id);
+
+    update_field('price_formatted', number_format((float)($item['price'] ?? 0), 0, ',', '.'), $post_id);
+
+    // Matterport
+    $matterport_url = null;
+    if (!empty($item['links']) && is_array($item['links'])) {
+        foreach ($item['links'] as $link) {
+            $u = $link['url'] ?? '';
+            if (is_string($u) && $u !== '' && stripos($u, 'matterport.com') !== false && filter_var($u, FILTER_VALIDATE_URL)) {
+                $matterport_url = esc_url_raw($u);
+                break;
+            }
+        }
+    }
+    update_field('matterport_link', $matterport_url ?? '', $post_id);
+
+    // Галерея + Grundriss отдельно
+    $gallery_urls  = [];
+    $floorplan_url = null;
+
+    foreach ($item['images'] ?? [] as $image) {
+        if (!empty($image['url'])) {
+            $url   = esc_url_raw($image['url']);
+            $title = sanitize_text_field($image['title'] ?? '');
+
+            if ($floorplan_url === null && (stripos($title, 'grundriss') !== false || stripos($url, 'grundriss') !== false)) {
+                $floorplan_url = $url; // сохраняем только первый план
+            } else {
+                $gallery_urls[] = [
+                    'url'   => $url,
+                    'title' => $title,
+                ];
+            }
+        }
+    }
+    update_field('gallery_urls', $gallery_urls, $post_id);
+    update_field('floorplan_url', $floorplan_url ?: '', $post_id);
+
+    // Exposé — ПЕРЕНЕСЕНО ВНУТРЬ if(function_exists('update_field')) !!!
+    $expose_url = null;
+    if (!empty($item['documents']) && is_array($item['documents'])) {
+        foreach ($item['documents'] as $document) {
+            $u = $document['doc']['url'] ?? '';
+            if (is_string($u) && $u !== '' && stripos($u, 'expose') !== false && filter_var($u, FILTER_VALIDATE_URL)) {
+                $expose_url = esc_url_raw($u);
+                break;
+            }
+        }
+    }
+    update_field('expose_url', $expose_url ?: '', $post_id);
+} // ← ЭТОЙ скобкой мы закрываем if(function_exists('update_field'))
+
+// 5. Dokumente als JSON (wenn nötig) — остаётся внутри функции
+$doc_urls = array_filter(array_map(function ($doc) {
+    return isset($doc['doc']['url']) && filter_var($doc['doc']['url'], FILTER_VALIDATE_URL)
+        ? $doc['doc']['url']
+        : null;
+}, $item['documents'] ?? []));
+
+if (!empty($doc_urls)) {
+    update_post_meta($post_id, 'propstack_document_urls', json_encode($doc_urls));
 }
 
-update_field('gallery_urls', $gallery_urls, $post_id);
-
-        }
-
-        // 5. Dokumente als JSON (wenn nötig)
-        $doc_urls = array_filter(array_map(function ($doc) {
-            return isset($doc['doc']['url']) && filter_var($doc['doc']['url'], FILTER_VALIDATE_URL)
-                ? $doc['doc']['url']
-                : null;
-        }, $item['documents'] ?? []));
-
-        if (!empty($doc_urls)) {
-            update_post_meta($post_id, 'propstack_document_urls', json_encode($doc_urls));
-        }
-
-        return $action;
+return $action;
     }
 }
