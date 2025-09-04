@@ -1,6 +1,7 @@
 <?php
 namespace Propstack\Includes\PostHandler;
 
+
 class ApartmentHandler
 {
      /**
@@ -129,7 +130,7 @@ class ApartmentHandler
     }
     update_field('matterport_link', $matterport_url ?? '', $post_id);
 
-    // Галерея + Grundriss отдельно
+    
     $gallery_urls  = [];
     $floorplan_url = null;
 
@@ -148,10 +149,11 @@ class ApartmentHandler
             }
         }
     }
+
     update_field('gallery_urls', $gallery_urls, $post_id);
     update_field('floorplan_url', $floorplan_url ?: '', $post_id);
 
-    // Exposé — ПЕРЕНЕСЕНО ВНУТРЬ if(function_exists('update_field')) !!!
+   
     $expose_url = null;
     if (!empty($item['documents']) && is_array($item['documents'])) {
         foreach ($item['documents'] as $document) {
@@ -163,7 +165,35 @@ class ApartmentHandler
         }
     }
     update_field('expose_url', $expose_url ?: '', $post_id);
-} // ← ЭТОЙ скобкой мы закрываем if(function_exists('update_field'))
+} 
+$featured_src = '';
+if (!empty($gallery_urls[0]['url'])) {
+    $featured_src = $gallery_urls[0]['url'];
+} elseif (!empty($floorplan_url)) {
+    $featured_src = $floorplan_url;
+}
+
+$parts = array_filter([
+    'Wohnung - ' . trim((string)($item['unit_id'] ?? '')),
+    trim((string)($item['street'] ?? '')) . (isset($item['house_number']) && $item['house_number'] !== '' ? ' ' . trim((string)$item['house_number']) : ''),
+    trim((string)($item['zip_code'] ?? '')) . (isset($item['city']) && $item['city'] !== '' ? ' ' . trim((string)$item['city']) : ''),
+]);
+
+$alt_text = implode(', ', array_filter($parts));
+
+
+// Фолбэк, если совсем пусто
+if ($alt_text === '') {
+    $alt_text = 'Wohnung ' . ($item['object_number'] ?? $post_id);
+}
+
+if ($featured_src) {
+    error_log("[propstack] ApartmentHandler: chosen featured_src for post {$post_id}: {$featured_src}");
+    \Propstack\Includes\MediaHelpers::set_featured_image_from_url($post_id, $featured_src, true, $alt_text);
+} else {
+    error_log("[propstack] ApartmentHandler: no featured_src for post {$post_id} (gallery empty, no floorplan)");
+}
+
 
 // 5. Dokumente als JSON (wenn nötig) — остаётся внутри функции
 $doc_urls = array_filter(array_map(function ($doc) {
