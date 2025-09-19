@@ -107,6 +107,18 @@ class ApartmentHandler
             update_field('related_project', $project_post_id, $post_id);
             update_field('object_number', $item['object_number'] ?? '', $post_id);
             update_field('status', $item['status'] ?? '', $post_id);
+
+            $we_label = '';
+            $source = trim((string) $item['unit_id']);
+if (preg_match('/\bWE[\s\-\/]*([0-9]+)(?:[\s\-\/]+([A-ZÄÖÜß]+[0-9]*))?/iu', $source, $m)) {
+    $digits = $m[1];
+    $suffix = (isset($m[2]) && $m[2] !== '') ? ' ' . mb_strtoupper($m[2], 'UTF-8') : '';
+    $we_label = 'WE ' . $digits . $suffix;
+} else {
+    $we_label = ''; 
+}
+update_field('we_label', $we_label, $post_id);
+
             $post_url = get_permalink($post_id);
     if ($status_name === 'Verfügbar') {
         $status_display = '<a href="' . esc_url($post_url) . '" title="Zur Detailseite ' . esc_attr($item['unit_id'] ?? '') . '">' . esc_html($status_name) . '</a>';
@@ -182,7 +194,7 @@ $parts = array_filter([
 $alt_text = implode(', ', array_filter($parts));
 
 
-// Фолбэк, если совсем пусто
+
 if ($alt_text === '') {
     $alt_text = 'Wohnung ' . ($item['object_number'] ?? $post_id);
 }
