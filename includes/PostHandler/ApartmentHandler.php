@@ -134,7 +134,7 @@ update_field('we_label', $we_label, $post_id);
     if (!empty($item['links']) && is_array($item['links'])) {
         foreach ($item['links'] as $link) {
             $u = $link['url'] ?? '';
-            if (is_string($u) && $u !== '' && stripos($u, 'matterport.com') !== false && filter_var($u, FILTER_VALIDATE_URL)) {
+            if (is_string($u) && $u !== '' && stripos($u, 'media.visonation.com') !== false && filter_var($u, FILTER_VALIDATE_URL)) {
                 $matterport_url = esc_url_raw($u);
                 break;
             }
