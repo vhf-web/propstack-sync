@@ -166,17 +166,71 @@ update_field('we_label', $we_label, $post_id);
     update_field('floorplan_url', $floorplan_url ?: '', $post_id);
 
    
-    $expose_url = null;
-    if (!empty($item['documents']) && is_array($item['documents'])) {
-        foreach ($item['documents'] as $document) {
-            $u = $document['doc']['url'] ?? '';
-            if (is_string($u) && $u !== '' && stripos($u, 'expose') !== false && filter_var($u, FILTER_VALIDATE_URL)) {
-                $expose_url = esc_url_raw($u);
-                break;
+  $chosen_doc = null;
+
+if (!empty($item['documents']) && is_array($item['documents'])) {
+    foreach ($item['documents'] as $document) {
+        $doc_id       = isset($document['id']) ? (int)$document['id'] : 0;
+        $doc_title    = isset($document['title']) ? (string)$document['title'] : '';
+        $doc_url      = isset($document['doc']['url']) ? (string)$document['doc']['url'] : '';
+        $content_type = isset($document['content_type']) ? (string)$document['content_type'] : '';
+        $checksum     = isset($document['checksum']) ? (string)$document['checksum']
+                       : (isset($document['updated_at']) ? (string)$document['updated_at'] : '');
+
+        if ($doc_id <= 0 || $doc_url === '' || !filter_var($doc_url, FILTER_VALIDATE_URL)) {
+            continue;
+        }
+
+        // если знаем тип и это не PDF — пропускаем
+        if ($content_type && stripos($content_type, 'pdf') === false) {
+            continue;
+        }
+
+        $path     = parse_url($doc_url, PHP_URL_PATH) ?: '';
+        $basename = $path !== '' ? basename($path) : '';
+
+        $looks_like_expose =
+            (bool) preg_match('/expos(?:é|e)/iu', $doc_title)
+            || (bool) preg_match('/expos(?:é|e)/iu', $basename)
+            || (bool) preg_match('/expos(?:é|e)/iu', $doc_url);
+
+        if ($looks_like_expose) {
+            $chosen_doc = [
+                'url'          => $doc_url,
+                'title'        => $doc_title,
+                'checksum'     => $checksum,
+            ];
+            if ($path && stripos($path, '.pdf') !== false) {
+                break; // нашли явный PDF Exposé — берём его
             }
         }
     }
-    update_field('expose_url', $expose_url ?: '', $post_id);
+}
+
+if ($chosen_doc) {
+    $pdf_url  = $chosen_doc['url'];
+    $title    = $chosen_doc['title'] !== '' ? $chosen_doc['title'] : ('expose-' . ($item['id'] ?? $post_id) . '.pdf');
+    $checksum = $chosen_doc['checksum'] ?? '';
+
+    $attach_id = \Propstack\Includes\MediaHelpers::import_or_update_pdf_for_post($post_id, $pdf_url, $title, $checksum);
+
+    if (\is_wp_error($attach_id)) {
+        error_log('[propstack] Exposé import failed for post ' . $post_id . ': ' . $attach_id->get_error_message());
+    } else {
+        if (function_exists('update_field')) {
+            update_field('expose_file', $attach_id, $post_id);
+        } else {
+            update_post_meta($post_id, 'expose_file', $attach_id);
+        }
+        $file_url = wp_get_attachment_url($attach_id);
+        if (function_exists('update_field')) {
+            update_field('expose_url', $file_url, $post_id);
+        } else {
+            update_post_meta($post_id, 'expose_url', $file_url);
+        }
+    }
+}
+
 } 
 $featured_src = '';
 if (!empty($gallery_urls[0]['url'])) {
