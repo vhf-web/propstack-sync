@@ -20,7 +20,7 @@ class SyncService
         $client = new ApiClient();
 
         $page = 1;
-        $per = 120;
+        $per = 400;
         $all_objects = [];
 
         do {
