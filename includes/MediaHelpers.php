@@ -1,5 +1,6 @@
 <?php 
 namespace Propstack\Includes;
+use WP_Error; 
 
 class MediaHelpers {
     public static function set_featured_image_from_url(int $post_id, string $image_url, bool $delete_old = true, string $alt_text = '') {
