@@ -9,10 +9,8 @@ class ProjectHandler
     {
         $apiClient = new ApiClient();
         $response = $apiClient->fetch(['project_ids' => implode(',', $projectIds)], 'projects');
-        error_log('[PropstackSync] Projekte-Response: ' . print_r($response, true));
 
         if (empty($response)) {
-            error_log('❌ Keine Projektdaten erhalten');
             return ['created' => 0, 'updated' => 0];
         }
 
@@ -36,17 +34,6 @@ class ProjectHandler
             ]);
 
             if (empty($existing)) {
-                $all_projects = get_posts([
-                    'post_type' => 'project',
-                    'numberposts' => -1,
-                    'post_status' => 'any',
-                ]);
-                
-                foreach ($all_projects as $p) {
-                    error_log("📌 Projekt ID {$p->ID} hat propstack_id: " . get_post_meta($p->ID, 'propstack_id', true));
-                }
-                
-                error_log("⚠️ Projekt mit propstack_id {$external_id} nicht gefunden – übersprungen");
                 $skipped++;
                 continue;
             }

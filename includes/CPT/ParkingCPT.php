@@ -28,7 +28,5 @@ class ParkingCPT
             'has_archive' => true,
             'show_in_rest' => true,
         ]);
-
-        error_log('[PropstackSync] ✅ ParkingCPT registered');
     }
 }

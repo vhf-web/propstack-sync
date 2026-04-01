@@ -16,7 +16,6 @@ class ApiClient
     $apiKey = defined('PROPSTACK_API_TOKEN') ? PROPSTACK_API_TOKEN : null;
 
     if (!$url || !$apiKey) {
-        error_log('❌ API URL oder Token fehlt.');
         return [];
     }
 
@@ -30,7 +29,6 @@ class ApiClient
     ]);
 
     if (is_wp_error($response)) {
-        error_log('❌ WP Error: ' . $response->get_error_message());
         return [];
     }
 

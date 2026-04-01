@@ -37,7 +37,5 @@ class ProjectCPT
             'show_in_rest'  => true,
             'rewrite'       => ['slug' => 'projekt'],
         ]);
-
-        error_log('[PropstackSync] ✅ CPT "Projekt" (slug: projekt) registered');
     }
 }

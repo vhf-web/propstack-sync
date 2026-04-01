@@ -35,7 +35,6 @@ new ApartmentCPT();
 new ProjectCPT();
 // Wenn Parking später gebraucht wird, aktivieren:
 // new ParkingCPT();
-error_log(print_r(get_post_type_object('project'), true));
 // 🧰 Weitere Komponenten nach Plugin-Load
 add_action('init', function () {
     if (class_exists(CronHandler::class)) {
@@ -56,11 +55,6 @@ add_action('init', function () {
 // 🛠️ Cron-Hooks
 register_activation_hook(__FILE__, [CronHandler::class, 'activate']);
 register_deactivation_hook(__FILE__, [CronHandler::class, 'deactivate']);
-
-// 🧪 Debug: registrierte Post Types anzeigen
-add_action('wp_loaded', function () {
-    error_log(print_r(get_post_types(), true));
-});
 
 // 🔍 Admin-Filter: Wohnungen nach Projekt filtern
 add_action('restrict_manage_posts', function () {

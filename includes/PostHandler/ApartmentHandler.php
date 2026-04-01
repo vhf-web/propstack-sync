@@ -214,9 +214,7 @@ if ($chosen_doc) {
 
     $attach_id = \Propstack\Includes\MediaHelpers::import_or_update_pdf_for_post($post_id, $pdf_url, $title, $checksum);
 
-    if (\is_wp_error($attach_id)) {
-        error_log('[propstack] Exposé import failed for post ' . $post_id . ': ' . $attach_id->get_error_message());
-    } else {
+    if (!\is_wp_error($attach_id)) {
         if (function_exists('update_field')) {
             update_field('expose_file', $attach_id, $post_id);
         } else {
@@ -254,10 +252,7 @@ if ($alt_text === '') {
 }
 
 if ($featured_src) {
-    error_log("[propstack] ApartmentHandler: chosen featured_src for post {$post_id}: {$featured_src}");
     \Propstack\Includes\MediaHelpers::set_featured_image_from_url($post_id, $featured_src, true, $alt_text);
-} else {
-    error_log("[propstack] ApartmentHandler: no featured_src for post {$post_id} (gallery empty, no floorplan)");
 }
 
 

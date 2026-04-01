@@ -38,8 +38,6 @@ class ApartmentCPT
             'has_archive'  => true,
             'show_in_rest' => true,
         ]);
-
-        error_log('[PropstackSync] ✅ CPT "Wohnungseinheiten" (slug: apartment) registered');
     }
 }
 
