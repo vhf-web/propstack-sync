@@ -77,22 +77,25 @@ class SyncService
             'objects' => $all_objects,
         ];
     }
-    function propstack_sync_all_projects() {
-    $args = [
-        'post_type' => 'project',
-        'post_status' => 'publish',
-        'posts_per_page' => -1,
-    ];
 
-    $projects = get_posts($args);
+    /**
+     * Synchronisiert alle veröffentlichten Projekte (z. B. täglicher Cron).
+     */
+    public function sync_all_projects(): void
+    {
+        $projects = get_posts([
+            'post_type'      => 'project',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+        ]);
 
-    $service = new \Propstack\Includes\SyncService();
-
-    foreach ($projects as $project) {
-        $project_id = get_field('project_id', $project->ID); // oder get_post_meta(...)
-        if ($project_id) {
-            $service->sync_project($project_id, $project->ID);
+        foreach ($projects as $project) {
+            $propstack_id = function_exists('get_field')
+                ? get_field('propstack_id', $project->ID)
+                : get_post_meta($project->ID, 'propstack_id', true);
+            if ($propstack_id) {
+                $this->sync_project((string) $propstack_id, $project->ID);
+            }
         }
     }
-}
 }

@@ -6,6 +6,11 @@ use Propstack\Includes\SyncService;
 
 class CronHandler
 {
+    public function __construct()
+    {
+        self::register();
+    }
+
     public static function register()
     {
         add_action('propstack_daily_sync_event', [self::class, 'run_daily_sync']);
@@ -14,9 +19,7 @@ class CronHandler
     public static function run_daily_sync()
     {
         $syncService = new SyncService();
-        if (function_exists('Propstack\Includes\propstack_sync_all_projects')) {
-            \Propstack\Includes\propstack_sync_all_projects();
-        }
+        $syncService->sync_all_projects();
     }
 
     public static function activate()
